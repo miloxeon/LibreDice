@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>LibreDice — a password generator built to be audited</title>
+		<style>
+			body {
+				max-width: 600px;
+				margin: 0 auto;
+				padding: 1rem 0.5rem;
+				font-family: system-ui, sans-serif;
+				line-height: 1.5;
+			}
+			p {
+				text-align: justify;
+				-webkit-hyphens: auto;
+				hyphens: auto;
+			}
+		</style>
+	</head>
+	<body>
+		Your new password is:
+		<div id="pwd" style="font-size: 2rem; margin-top: 1rem; min-height: 3rem"></div>
+		<button id="regen">Make new one</button>
+		<p style="margin-top: 2rem">When was the last time you read your password generator’s source code?</p>
+		<p>
+			If you didn’t, it’s just “trust me, bro” with extra steps. Though even if you did, when a server is involved in
+			generating passwords, you have no way to verify that the server runs the code it says it runs. Even if a tool
+			claims to be independently audited, what prevents its authors from removing the spying part of their code prior
+			to requesting an audit, passing the audit and then adding the spyware part back?
+		</p>
+		<p>
+			That’s why we made LibreDice — an offline, private and secure password generator that is built to be audited by
+			<strong>you</strong>.
+		</p>
+		<p>
+			Just click the right mouse button, click “view page source” and read the code — it’s commented extensively.
+			Only then can you be certain that the code works exactly as you think it does. Copy and paste it to the AI chat
+			of your choice and ask whether the code has any backdoors, logging or calling home.
+		</p>
+		<p>
+			Everything happens in your browser. The whole generator is just one file that makes zero network requests. No
+			external assets, no tracking, no cookies, no permissions.
+		</p>
+
+		<p>
+			Passwords that LibreDice generates have 111 bits of entropy. Proton suggests at least 75 bits, so our passwords
+			are pretty secure.
+		</p>
+		<p>
+			LibreDice is made by Milo Xeon and is available under <a href="LICENSE.txt">EUPL 1.2 license</a>. Hosted in
+			Europe by Codeberg e. V. Not affiliated with Codeberg.
+		</p>
+
+		<script type="module">
+			// This is the UI element that displays passwords
+			const passwordDisplay = document.getElementById('pwd')
+
+			// This is the button that says "Make new one"
+			const regenerateButton = document.getElementById('regen')
+
+			// This function makes a random number between 0 and n.
+			// Because max n we ever use is 20, modulo bias is negligible — read "this is secure"
+			function makeRandomNumber(maxValue) {
+				return crypto.getRandomValues(new Uint32Array(1))[0] % (maxValue + 1)
+			}
+
+			// This function makes a random consonant
+			function makeRandomConsonant() {
+				const consonants = 'bcdfghjklmnpqrstvwxz' // The string that contains all consonants, 20 letters long
+				const randomIndex = makeRandomNumber(consonants.length - 1) // A random number between 0 and 19
+				return consonants[randomIndex] // A random consonant
+			}
+
+			// This function makes a random vowel
+			function makeRandomVowel() {
+				const vowels = 'aeiouy' // The string that contains all vowels, 6 letters long
+				const randomIndex = makeRandomNumber(vowels.length - 1) // A random number between 0 and 5
+				return vowels[randomIndex] // A random vowel
+			}
+
+			// This function makes a random word of set length.
+			// A word in this context means a text string made of random syllables,
+			// where each syllable is a random consonant followed by a random vowel
+			function makeRandomWord(wordLength) {
+				let result = '' // The word, empty for now. We will add letters to it as we go
+
+				// Make a loop between 0 and wordLength
+				for (let i = 0; i < wordLength; i++) {
+					const isEven = i % 2 == 0 // Check if the 'i' value of current loop iteration is evenly divisible by 2
+					if (isEven) {
+						result = result + makeRandomConsonant() // If it's even, add random consonant to our word
+					} else {
+						result = result + makeRandomVowel() // If it's odd, add random vowel to our word
+					}
+				}
+				return result // When the loop ends, return our word
+			}
+
+			// This function makes a random hexadecimal string
+			function makeRandomHexString() {
+				const randomUUID = crypto.randomUUID() // A random UUID looks like bf6d119f-e1ca-4af3-8621-f5422619103d
+				const hexStrings = randomUUID.split('-') // This will give us an array like ['bf6d119f', 'e1ca', '4af3', '8621', 'f5422619103d']
+				return hexStrings[0] // Take the first element of that array, e.g. 'bf6d119f'
+			}
+
+			// This function generates a password
+			function generatePassword() {
+				// A password consists of three random words and one random hex string, connected with dashes
+				const word1 = makeRandomWord(7) // First random word
+				const word2 = makeRandomWord(7) // Second random word
+				const word3 = makeRandomWord(7) // Third random word
+
+				// Make hex string uppercase because many websites require uppercase characters when you set your password
+				const hexString = makeRandomHexString().toUpperCase()
+
+				// Make the password by joining all four segments with dashes
+				return [word1, word2, word3, hexString].join('-')
+			}
+
+			// This function generates a password and displays it in the UI
+			function generateAndDisplay() {
+				const password = generatePassword()
+				passwordDisplay.innerText = password
+			}
+
+			// Make it so when the "Regenerate" button is clicked, generateAndDisplay function is called
+			regenerateButton.onclick = generateAndDisplay
+
+			// Call the function manually the first time to generate and display the initial password when the page loads
+			generateAndDisplay()
+
+			// This function displays paste warning in console. If you paste something there, you can compromise
+			// the passwords you generate.
+			function displayPasteWarningInConsole() {
+				const style1 = 'font-size: 48px; font-weight: bold; color: red; text-shadow: 2px 2px black'
+				const style2 = 'font-size: 18px; color: white; background-color: red; padding: 8px'
+
+				console.log('%cSTOP!', style1)
+				console.log(
+					'%cThis is a browser feature intended for developers.\nIf someone told you to copy-paste something here, it could be a scam and give them access to your passwords.',
+					style2
+				)
+				console.log(
+					'%cNEVER PASTE ANYTHING IN THIS CONSOLE UNLESS YOU UNDERSTAND EXACTLY WHAT YOU ARE DOING.',
+					style2
+				)
+			}
+			displayPasteWarningInConsole() // Display the paste warning
+		</script>
+	</body>
+</html>
