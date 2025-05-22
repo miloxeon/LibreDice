@@ -14,7 +14,7 @@ Passwords that LibreDice generates have 111 bits of entropy. Proton suggests at 
 
 ## Web version
 
-Available at [miloxeon.codeberg.page/LibreDice](https://miloxeon.codeberg.page/LibreDice).
+Available at [miloxeon.codeberg.page/libredice](https://miloxeon.codeberg.page/libredice).
 
 ## Console version
 
