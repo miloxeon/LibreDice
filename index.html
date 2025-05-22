@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -17,12 +17,25 @@
 				-webkit-hyphens: auto;
 				hyphens: auto;
 			}
+			#pwd1,
+			#pwd2,
+			#pwd3,
+			#pwd4,
+			#pwd5 {
+				display: block;
+				font-size: 1.5rem;
+				min-height: 2.25rem;
+			}
 		</style>
 	</head>
 	<body>
-		Your new password is:
-		<div id="pwd" style="font-size: 2rem; margin-top: 1rem; min-height: 3rem"></div>
-		<button id="regen">Make new one</button>
+		Your new passwords are:
+		<output id="pwd1" style="margin-top: 1rem"></output>
+		<output id="pwd2"></output>
+		<output id="pwd3"></output>
+		<output id="pwd4"></output>
+		<output id="pwd5"></output>
+		<button id="regen" style="margin-top: 1rem">Make new ones</button>
 		<p style="margin-top: 2rem">When was the last time you read your password generator’s source code?</p>
 		<p>
 			If you didn’t, it’s just “trust me, bro” with extra steps. Though even if you did, when a server is involved in
@@ -43,7 +56,6 @@
 			Everything happens in your browser. The whole generator is just one file that makes zero network requests. No
 			external assets, no tracking, no cookies, no permissions.
 		</p>
-
 		<p>
 			Passwords that LibreDice generates have 111 bits of entropy. Proton suggests at least 75 bits, so our passwords
 			are pretty secure.
@@ -54,11 +66,15 @@
 		</p>
 
 		<script type="module">
-			// This is the UI element that displays passwords
-			const passwordDisplay = document.getElementById('pwd')
+			// This is the button that says "Make new ones"
+			const makeNewOnesButton = document.getElementById('regen')
 
-			// This is the button that says "Make new one"
-			const regenerateButton = document.getElementById('regen')
+			// These are UI elements that display passwords
+			const passwordDisplay1 = document.getElementById('pwd1')
+			const passwordDisplay2 = document.getElementById('pwd2')
+			const passwordDisplay3 = document.getElementById('pwd3')
+			const passwordDisplay4 = document.getElementById('pwd4')
+			const passwordDisplay5 = document.getElementById('pwd5')
 
 			// This function makes a random number between 0 and n.
 			// Because max n we ever use is 20, modulo bias is negligible — read "this is secure"
@@ -121,14 +137,26 @@
 
 			// This function generates a password and displays it in the UI
 			function generateAndDisplay() {
-				const password = generatePassword()
-				passwordDisplay.innerText = password
+				const password1 = generatePassword()
+				passwordDisplay1.innerText = password1
+
+				const password2 = generatePassword()
+				passwordDisplay2.innerText = password2
+
+				const password3 = generatePassword()
+				passwordDisplay3.innerText = password3
+
+				const password4 = generatePassword()
+				passwordDisplay4.innerText = password4
+
+				const password5 = generatePassword()
+				passwordDisplay5.innerText = password5
 			}
 
-			// Make it so when the "Regenerate" button is clicked, generateAndDisplay function is called
-			regenerateButton.onclick = generateAndDisplay
+			// Make it so when the "Make new ones" button is clicked, generateAndDisplay function is called
+			makeNewOnesButton.onclick = generateAndDisplay
 
-			// Call the function manually the first time to generate and display the initial password when the page loads
+			// Call the function manually the first time to generate and display initial passwords when the page loads
 			generateAndDisplay()
 
 			// This function displays paste warning in console. If you paste something there, you can compromise
